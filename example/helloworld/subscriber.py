@@ -5,7 +5,7 @@ from user_data import *
 
 
 if __name__ == "__main__":
-    ChannelFactoryInitialize()
+    ChannelFactoryInitialize(0, "en9")
     # Create a subscriber to subscribe the data defined in UserData class
     sub = ChannelSubscriber("topic", UserData)
     sub.Init()

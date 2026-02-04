@@ -199,7 +199,7 @@ class ChannelFactory(Singleton):
     def __init__(self):
         super().__init__()
 
-    def Init(self, id: int, networkInterface: str = None, qos: Qos = None):
+    def Init(self, id: int, networkInterface: str = None, qos: Qos = None, peers: list = None):
         if self.__class__.__initialized:
             return True
         
@@ -213,6 +213,13 @@ class ChannelFactory(Singleton):
                 config = ChannelConfigAutoDetermine
             else:
                 config = ChannelConfigHasInterface.replace('$__IF_NAME__$', networkInterface)
+
+            if peers is not None and len(peers) > 0:
+                peer_xml = "<Discovery><Peers>"
+                for peer in peers:
+                    peer_xml += f'<Peer address="{peer}"/>'
+                peer_xml += "</Peers><ParticipantIndex>auto</ParticipantIndex></Discovery>"
+                config = config.replace("</General>", f"</General>{peer_xml}")
 
             try:
                 self.__class__.__domain = Domain(id, config)
@@ -295,7 +302,7 @@ class ChannelSubscriber:
 """
 " function ChannelFactoryInitialize. used to intialize channel everenment.
 """
-def ChannelFactoryInitialize(id: int = 0, networkInterface: str = None):
+def ChannelFactoryInitialize(id: int = 0, networkInterface: str = None, peers: list = None):
     factory = ChannelFactory()
-    if not factory.Init(id, networkInterface):
+    if not factory.Init(id, networkInterface, peers=peers):
         raise Exception("channel factory init error.")
